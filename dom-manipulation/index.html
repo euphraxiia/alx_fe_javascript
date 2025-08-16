@@ -3,94 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Quote Generator with Filtering</title>
+    <title>Dynamic Quote Generator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <h1>Dynamic Quote Generator</h1>
         
-        <!-- Category Filter Section -->
-        <div class="filter-section">
-            <h3>Filter by Category:</h3>
-            <select id="categoryFilter" onchange="filterQuotes()" class="category-select">
-                <option value="all">All Categories</option>
-                <!-- Dynamically populated categories -->
-            </select>
-            <button id="clearFilter" onclick="clearFilter()" class="btn btn-secondary">Clear Filter</button>
+        <!-- Sync Status Indicator -->
+        <div id="sync-status" class="sync-status">
+            <span id="sync-indicator" class="sync-indicator">🔄</span>
+            <span id="sync-text">Checking for updates...</span>
         </div>
-        
+
+        <!-- Notification System -->
+        <div id="notification-container" class="notification-container"></div>
+
         <!-- Quote Display -->
         <div id="quoteDisplay" class="quote-display">
-            <p class="quote-text">Click "Show New Quote" to display a random quote!</p>
-            <p class="quote-category"></p>
+            <blockquote id="quote-text">Click "Show New Quote" to get started!</blockquote>
+            <cite id="quote-author">- Welcome</cite>
         </div>
-        
+
         <!-- Controls -->
         <div class="controls">
             <button id="newQuote" class="btn btn-primary">Show New Quote</button>
-            <button id="addQuoteBtn" class="btn btn-secondary">Add New Quote</button>
-            <button id="exportQuotes" onclick="exportQuotes()" class="btn btn-info">Export Quotes</button>
+            <button id="addQuote" class="btn btn-secondary">Add New Quote</button>
+            <button id="exportQuotes" class="btn btn-info">Export Quotes</button>
+            <button id="importFile" class="btn btn-warning">Import from File</button>
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
         </div>
-        
+
         <!-- Add Quote Form -->
         <div id="addQuoteForm" class="add-quote-form" style="display: none;">
-            <h3>Add Your Own Quote</h3>
-            <div class="form-group">
-                <label for="newQuoteText">Quote Text:</label>
-                <textarea id="newQuoteText" placeholder="Enter a new quote" class="input-field" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="newQuoteCategory">Category:</label>
-                <input id="newQuoteCategory" type="text" placeholder="Enter quote category" class="input-field" />
-                <small class="helper-text">Existing categories: <span id="existingCategories"></span></small>
-            </div>
-            <div class="form-actions">
-                <button onclick="addQuote()" class="btn btn-success">Add Quote</button>
-                <button onclick="cancelAddQuote()" class="btn btn-cancel">Cancel</button>
+            <h3>Add New Quote</h3>
+            <textarea id="newQuoteText" placeholder="Enter quote text..." rows="3"></textarea>
+            <input type="text" id="newQuoteAuthor" placeholder="Enter author name...">
+            <div class="form-controls">
+                <button id="saveQuote" class="btn btn-success">Save Quote</button>
+                <button id="cancelAdd" class="btn btn-danger">Cancel</button>
             </div>
         </div>
-        
-        <!-- Statistics Section -->
-        <div class="stats-section">
-            <h3>Statistics</h3>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number" id="totalQuotes">0</span>
-                    <span class="stat-label">Total Quotes</span>
+
+        <!-- Category Filter -->
+        <div class="filter-section">
+            <label for="categoryFilter">Filter by Category:</label>
+            <select id="categoryFilter">
+                <option value="all">All Categories</option>
+                <option value="motivational">Motivational</option>
+                <option value="wisdom">Wisdom</option>
+                <option value="humor">Humor</option>
+                <option value="life">Life</option>
+            </select>
+        </div>
+
+        <!-- Manual Sync Controls -->
+        <div class="sync-controls">
+            <button id="manualSync" class="btn btn-info">Manual Sync</button>
+            <button id="resolveConflicts" class="btn btn-warning" style="display: none;">Resolve Conflicts</button>
+        </div>
+
+        <!-- Conflict Resolution Modal -->
+        <div id="conflictModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Conflict Resolution Required</h3>
+                <p>There are conflicting versions of quotes. Choose how to resolve:</p>
+                <div id="conflictOptions">
+                    <button id="keepServer" class="btn btn-primary">Keep Server Version</button>
+                    <button id="keepLocal" class="btn btn-secondary">Keep Local Version</button>
+                    <button id="mergeData" class="btn btn-success">Merge Both</button>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="totalCategories">0</span>
-                    <span class="stat-label">Categories</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="filteredQuotes">0</span>
-                    <span class="stat-label">Filtered Results</span>
-                </div>
+                <div id="conflictDetails" class="conflict-details"></div>
             </div>
-        </div>
-        
-        <!-- Filtered Quotes Display -->
-        <div id="quotesListContainer" class="quotes-list-container">
-            <h3>
-                <span id="quotesListTitle">All Quotes</span>
-                <span id="quotesCount" class="quotes-count">(0)</span>
-            </h3>
-            <div id="quotesContainer" class="quotes-container"></div>
-        </div>
-        
-        <!-- Import Section -->
-        <div class="import-section">
-            <h3>Import Quotes</h3>
-            <input type="file" id="importFile" accept=".json" onchange="importQuotes(event)" class="file-input">
-            <button onclick="resetToDefaults()" class="btn btn-warning">Reset to Default Quotes</button>
         </div>
     </div>
-    
-    <!-- Notification Container -->
-    <div id="notificationContainer" class="notification-container"></div>
-    
+
+    <script src="quotes.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
 </html>
