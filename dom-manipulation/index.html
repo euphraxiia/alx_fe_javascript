@@ -3,47 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Quote Generator</title>
+    <title>Dynamic Quote Generator - Web Storage Edition</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Dynamic Quote Generator</h1>
+        <header>
+            <h1>Dynamic Quote Generator</h1>
+            <p class="subtitle">With Local Storage & JSON Import/Export</p>
+        </header>
         
-        <div id="quoteDisplay" class="quote-display">
-            <p class="quote-text">Click "Show New Quote" to display a random quote!</p>
-            <p class="quote-category"></p>
-        </div>
-        
-        <div class="controls">
-            <button id="newQuote" class="btn btn-primary">Show New Quote</button>
-            <button id="addQuoteBtn" class="btn btn-secondary">Add New Quote</button>
-        </div>
-        
-        <div id="addQuoteForm" class="add-quote-form" style="display: none;">
-            <h3>Add Your Own Quote</h3>
-            <div class="form-group">
-                <input id="newQuoteText" type="text" placeholder="Enter a new quote" class="input-field" />
+        <!-- Storage Status Display -->
+        <div class="storage-status">
+            <div class="storage-info">
+                <span class="storage-label">Local Storage:</span>
+                <span id="localStorageStatus" class="storage-value">Loading...</span>
             </div>
-            <div class="form-group">
-                <input id="newQuoteCategory" type="text" placeholder="Enter quote category" class="input-field" />
-            </div>
-            <div class="form-actions">
-                <button onclick="addQuote()" class="btn btn-success">Add Quote</button>
-                <button onclick="cancelAddQuote()" class="btn btn-cancel">Cancel</button>
+            <div class="storage-info">
+                <span class="storage-label">Session Data:</span>
+                <span id="sessionStorageStatus" class="storage-value">Loading...</span>
             </div>
         </div>
         
-        <div id="categoryFilter" class="category-filter">
+        <!-- Category Filter Section -->
+        <div class="filter-section">
             <h3>Filter by Category:</h3>
-            <select id="categorySelect" class="select-field">
+            <select id="categoryFilter" onchange="filterQuotes()" class="category-select">
                 <option value="all">All Categories</option>
             </select>
+            <button id="clearFilter" onclick="clearFilter()" class="btn btn-secondary">Clear Filter</button>
         </div>
         
-        <div id="quotesList" class="quotes-list">
-            <h3>All Quotes:</h3>
-            <div id="quotesContainer"></div>
+        <!-- Quote Display -->
+        <div id="quoteDisplay" class="quote-display">
+            <p class="quote-text">Click "Show Random Quote" to display a quote!</p>
+            <p class="quote-category"></p>
+            <p class="quote-timestamp"></p>
+        </div>
+        
+        <!-- Main Controls -->
+        <div class="controls">
+            <button id="newQuote" class="btn btn-primary">Show Random Quote</button>
+            <button id="addQuoteBtn" class="btn btn-secondary">Add New Quote</button>
+            <button id="lastViewedQuote" class="btn btn-info">Last Viewed Quote</button>
+        </div>
+        
+        <!-- Data Management Section -->
+        <div class="data-management">
+            <h3>Data Management</h3>
+            <div class="data-controls">
+                <button onclick="exportToJson()" class="btn btn-success">
+                    📤 Export to JSON
+                </button>
+                <div class="import-container">
+                    <label for="importFile" class="btn btn-warning">
+                        📥 Import from JSON
+                    </label>
+                    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" style="display: none;" />
+                </div>
+                <button onclick="clearAllData()" class="btn btn-danger">
+                    🗑️ Clear All Data
+                </button>
+                <button onclick="resetToDefaults()" class="btn btn-neutral">
+                    🔄 Reset to Defaults
+                </button>
+            </div>
+        </div>
+        
+        <!-- Storage Operations -->
+        <div class="storage-operations">
+            <h3>Storage Operations</h3>
+            <div class="storage-controls">
+                <button onclick="saveQuotes()" class="btn btn-save">💾 Save to Local Storage</button>
+                <button onclick="loadQuotes()" class="btn btn-load">📂 Load from Local Storage</button>
+                <button onclick="clearSessionData()" class="btn btn-session">🧹 Clear Session Data</button>
+                <button onclick="showStorageInfo()" class="btn btn-info-storage">ℹ️ Storage Info</button>
+            </div>
+        </div>
+        
+        <!-- Add Quote Form -->
+        <div id="addQuoteForm" class="add-quote-form" style="display: none;">
+            <h3>Add Your Own Quote</h3>
+            <form id="quoteForm" onsubmit="addQuote(event)">
+                <div class="form-group">
+                    <label for="newQuoteText">Quote Text:</label>
+                    <textarea id="newQuoteText" placeholder="Enter a new quote" class="input-field" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="newQuoteCategory">Category:</label>
+                    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" class="input-field" required />
+                    <small class="helper-text">Existing categories: <span id="existingCategories"></span></small>
+                </div>
+                <div class="form-group">
+                    <label for="newQuoteAuthor">Author (Optional):</label>
+                    <input id="newQuoteAuthor" type="text" placeholder="Enter quote author" class="input-field" />
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Add Quote</button>
+                    <button type="button" onclick="cancelAddQuote()" class="btn btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h3>Statistics & Storage Info</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalQuotes">0</span>
+                    <span class="stat-label">Total Quotes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalCategories">0</span>
+                    <span class="stat-label">Categories</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="filteredQuotes">0</span>
+                    <span class="stat-label">Filtered Results</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="storageUsage">0</span>
+                    <span class="stat-label">Storage Usage (KB)</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quotes List Display -->
+        <div id="quotesListContainer" class="quotes-list-container">
+            <h3>
+                <span id="quotesListTitle">All Quotes</span>
+                <span id="quotesCount" class="quotes-count">(0)</span>
+            </h3>
+            <div class="list-controls">
+                <button onclick="toggleQuotesList()" id="toggleListBtn" class="btn btn-toggle">Show All Quotes</button>
+                <select id="sortBy" onchange="sortQuotes()" class="sort-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="category">By Category</option>
+                    <option value="author">By Author</option>
+                </select>
+            </div>
+            <div id="quotesContainer" class="quotes-container" style="display: none;"></div>
+        </div>
+        
+        <!-- Session Activity Log -->
+        <div class="session-log">
+            <h3>Session Activity</h3>
+            <div id="activityLog" class="activity-log"></div>
+            <button onclick="clearActivityLog()" class="btn btn-clear-log">Clear Log</button>
+        </div>
+    </div>
+    
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+    
+    <!-- Storage Info Modal -->
+    <div id="storageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Storage Information</h3>
+                <button onclick="closeStorageModal()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body" id="storageModalBody">
+                <!-- Storage info will be inserted here -->
+            </div>
         </div>
     </div>
     
