@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Quote Generator - Test Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .test-controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .test-btn.run-all {
+            background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+            font-size: 1.1rem;
+            padding: 15px 30px;
+        }
+
+        .results-container {
+            padding: 30px;
+        }
+
+        .test-category {
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #495057;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .test-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-item:hover {
+            background: #f8f9fa;
+        }
+
+        .test-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .test-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pass {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .summary h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .summary-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
+        .pending { color: #ffc107; }
+
+        .error-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #721c24;
+            display: none;
+        }
+
+        .test-item.fail .error-details {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .header p { font-size: 1rem; }
+            .test-controls { flex-direction: column; align-items: center; }
+            .summary-stats { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Dynamic Quote Generator Test Checker</h1>
+            <p>Comprehensive testing for all project requirements</p>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-btn run-all" onclick="runAllTests()">🚀 Run All Tests</button>
+            <button class="test-btn" onclick="runFileTests()">📁 File Structure</button>
+            <button class="test-btn" onclick="runBasicTests()">⚡ Basic Features</button>
+            <button class="test-btn" onclick="runStorageTests()">💾 Storage Features</button>
+            <button class="test-btn" onclick="runCategoryTests()">🏷️ Category Features</button>
+            <button class="test-btn" onclick="runSyncTests()">🔄 Sync Features</button>
+        </div>
+
+        <div class="results-container">
+            <div class="summary" id="summary" style="display: none;">
+                <h3>Test Summary</h3>
+                <div class="summary-stats">
+                    <div class="stat">
+                        <span class="stat-number pass" id="passCount">0</span>
+                        <span class="stat-label">Passed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number fail" id="failCount">0</span>
+                        <span class="stat-label">Failed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number pending" id="pendingCount">0</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test configuration and state
+        const testState = {
+            results: {},
+            scriptContent: '',
+            htmlContent: '',
+            cssContent: ''
+        };
+
+        // Test definitions
+        const testCategories = {
+            'File Structure': {
+                'Check if index.html exists': () => checkFileExists('index.html'),
+                'Check if script.js exists': () => checkFileExists('script.js'),
+                'Check if style.css exists': () => checkFileExists('style.css'),
+            },
+            'Basic Quote Functionality': {
+                'Check for quotes array with text and category properties': () => checkQuotesArray(),
+                'Check for displayRandomQuote function': () => checkFunction('displayRandomQuote'),
+                'Check for addQuote function': () => checkFunction('addQuote'),
+                'Check for "Show New Quote" button event listener': () => checkEventListener('newQuote', 'click'),
+                'Check for logic to select random quote and update DOM': () => checkRandomQuoteLogic(),
+                'Check for logic to add new quote to array and update DOM': () => checkAddQuoteLogic(),
+            },
+            'Local Storage Features': {
+                'Check for saving quotes to local storage': () => checkLocalStorageSave(),
+                'Check for loading quotes from local storage on initialization': () => checkLocalStorageLoad(),
+                'Check for saving last viewed quote to session storage': () => checkSessionStorageSave(),
+                'Check for export quotes button': () => checkExportButton(),
+                'Check for exportToJsonFile function': () => checkFunction('exportToJsonFile'),
+                'Check for import quotes file input': () => checkImportInput(),
+                'Check for importFromJsonFile function': () => checkFunction('importFromJsonFile'),
+            },
+            'Category Filter Features': {
+                'Check for populateCategories function': () => checkFunction('populateCategories'),
+                'Check for extracting unique categories and populating dropdown': () => checkCategoryPopulation(),
+                'Check for filterQuotes function': () => checkFunction('filterQuotes'),
+                'Check for logic to filter quotes based on selected category': () => checkFilterLogic(),
+                'Check for saving selected category to local storage': () => checkCategorySave(),
+                'Check for restoring last selected category on page load': () => checkCategoryRestore(),
+            },
+            'Server Sync Features': {
+                'Check for fetchQuotesFromServer function': () => checkFunction('fetchQuotesFromServer'),
+                'Check for fetching data from server using mock API': () => checkServerFetch(),
+                'Check for posting data to server using mock API': () => checkServerPost(),
+                'Check for syncQuotes function': () => checkFunction('syncQuotes'),
+                'Check for periodically checking for new quotes from server': () => checkPeriodicSync(),
+                'Check for updating local storage with server data and conflict resolution': () => checkConflictResolution(),
+                'Check for UI elements or notifications for data updates or conflicts': () => checkSyncUI(),
+            }
+        };
+
+        // File checking utilities
+        function checkFileExists(filename) {
+            try {
+                // Try to fetch the file
+                return fetch(filename)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text().then(content => {
+                                if (filename === 'script.js') testState.scriptContent = content;
+                                if (filename === 'index.html') testState.htmlContent = content;
+                                if (filename === 'style.css') testState.cssContent = content;
+                                return { pass: true, message: `${filename} exists and is accessible` };
+                            });
+                        } else {
+                            return { pass: false, message: `${filename} not found (${response.status})` };
+                        }
+                    })
+                    .catch(error => {
+                        return { pass: false, message: `Error accessing ${filename}: ${error.message}` };
+                    });
+            } catch (error) {
+                return Promise.resolve({ pass: false, message: `Error checking ${filename}: ${error.message}` });
+            }
+        }
+
+        // Script content checking utilities
+        function checkFunction(functionName) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const exists = testState.scriptContent.includes(`function ${functionName}`) || 
+                                  testState.scriptContent.includes(`${functionName} =`) ||
+                                  testState.scriptContent.includes(`const ${functionName}`) ||
+                                  testState.scriptContent.includes(`let ${functionName}`);
+                    resolve({
+                        pass: exists,
+                        message: exists ? 
+                            `${functionName} function found` : 
+                            `${functionName} function not found in script.js`
+                    });
+                }, 100);
+            });
+        }
+
+        function checkQuotesArray() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasQuotesArray = testState.scriptContent.includes('quotes = [') || 
+                                          testState.scriptContent.includes('let quotes') ||
+                                          testState.scriptContent.includes('const quotes');
+                    const hasTextProperty = testState.scriptContent.includes('text:');
+                    const hasCategoryProperty = testState.scriptContent.includes('category:');
+                    
+                    const pass = hasQuotesArray && hasTextProperty && hasCategoryProperty;
+                    resolve({
+                        pass,
+                        message: pass ? 
+                            'Quotes array with text and category properties found' :
+                            'Quotes array with required properties (text, category) not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkEventListener(elementId, eventType) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasEventListener = testState.scriptContent.includes(`getElementById('${elementId}')`) &&
+                                            testState.scriptContent.includes(`addEventListener('${eventType}'`);
+                    resolve({
+                        pass: hasEventListener,
+                        message: hasEventListener ?
+                            `Event listener for ${elementId} (${eventType}) found` :
+                            `Event listener for ${elementId} (${eventType}) not found`
+                    });
+                }, 100);
+            });
+        }
+
+        function checkRandomQuoteLogic() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasRandomLogic = testState.scriptContent.includes('Math.random()') &&
+                                          testState.scriptContent.includes('Math.floor') &&
+                                          (testState.scriptContent.includes('textContent') || testState.scriptContent.includes('innerHTML'));
+                    resolve({
+                        pass: hasRandomLogic,
+                        message: hasRandomLogic ?
+                            'Random quote selection and DOM update logic found' :
+                            'Random quote selection and DOM update logic not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkAddQuoteLogic() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasAddLogic = testState.scriptContent.includes('push(') &&
+                                       (testState.scriptContent.includes('newQuoteText') || testState.scriptContent.includes('getElementById'));
+                    resolve({
+                        pass: hasAddLogic,
+                        message: hasAddLogic ?
+                            'Add quote logic found' :
+                            'Add quote logic (push to array, get input values) not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkLocalStorageSave() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasLocalStorageSave = testState.scriptContent.includes('localStorage.setItem') &&
+                                               testState.scriptContent.includes('JSON.stringify');
+                    resolve({
+                        pass: hasLocalStorageSave,
+                        message: hasLocalStorageSave ?
+                            'Local storage save functionality found' :
+                            'Local storage save functionality not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkLocalStorageLoad() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasLocalStorageLoad = testState.scriptContent.includes('localStorage.getItem') &&
+                                               testState.scriptContent.includes('JSON.parse');
+                    resolve({
+                        pass: hasLocalStorageLoad,
+                        message: hasLocalStorageLoad ?
+                            'Local storage load functionality found' :
+                            'Local storage load functionality not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkSessionStorageSave() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasSessionStorageSave = testState.scriptContent.includes('sessionStorage.setItem') &&
+                                                testState.scriptContent.includes('lastViewedQuote');
+                    resolve({
+                        pass: hasSessionStorageSave,
+                        message: hasSessionStorageSave ?
+                            'Session storage save for last viewed quote found' :
+                            'Session storage save for last viewed quote not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkExportButton() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasExportButton = testState.htmlContent.includes('exportQuotes') ||
+                                           testState.htmlContent.includes('Export');
+                    resolve({
+                        pass: hasExportButton,
+                        message: hasExportButton ?
+                            'Export quotes button found' :
+                            'Export quotes button not found in HTML'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkImportInput() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasImportInput = testState.htmlContent.includes('type="file"') &&
+                                          (testState.htmlContent.includes('importFile') || testState.htmlContent.includes('import'));
+                    resolve({
+                        pass: hasImportInput,
+                        message: hasImportInput ?
+                            'Import file input found' :
+                            'Import file input not found in HTML'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkCategoryPopulation() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasCategoryLogic = testState.scriptContent.includes('Set(') &&
+                                           testState.scriptContent.includes('map(') &&
+                                           testState.scriptContent.includes('category') &&
+                                           testState.scriptContent.includes('option');
+                    resolve({
+                        pass: hasCategoryLogic,
+                        message: hasCategoryLogic ?
+                            'Category extraction and dropdown population logic found' :
+                            'Category extraction and dropdown population logic not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkFilterLogic() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasFilterLogic = testState.scriptContent.includes('filter(') &&
+                                          testState.scriptContent.includes('category') &&
+                                          testState.scriptContent.includes('categoryFilter');
+                    resolve({
+                        pass: hasFilterLogic,
+                        message: hasFilterLogic ?
+                            'Quote filtering logic found' :
+                            'Quote filtering logic not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkCategorySave() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasCategorySave = testState.scriptContent.includes('selectedCategory') &&
+                                          testState.scriptContent.includes('localStorage.setItem');
+                    resolve({
+                        pass: hasCategorySave,
+                        message: hasCategorySave ?
+                            'Category save to local storage found' :
+                            'Category save to local storage not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkCategoryRestore() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasCategoryRestore = testState.scriptContent.includes('localStorage.getItem') &&
+                                             testState.scriptContent.includes('selectedCategory') &&
+                                             testState.scriptContent.includes('value =');
+                    resolve({
+                        pass: hasCategoryRestore,
+                        message: hasCategoryRestore ?
+                            'Category restore from local storage found' :
+                            'Category restore from local storage not found'
+                    });
+                }, 100);
+            });
+        }
+
+        // Server sync tests
+        function checkServerFetch() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasServerFetch = testState.scriptContent.includes('fetch(') &&
+                                          (testState.scriptContent.includes('jsonplaceholder') || 
+                                           testState.scriptContent.includes('SERVER_URL') ||
+                                           testState.scriptContent.includes('mock'));
+                    resolve({
+                        pass: hasServerFetch,
+                        message: hasServerFetch ?
+                            'Server data fetching using mock API found' :
+                            'Server data fetching using mock API not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkServerPost() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasServerPost = testState.scriptContent.includes('fetch(') &&
+                                         testState.scriptContent.includes('POST') &&
+                                         testState.scriptContent.includes('JSON.stringify');
+                    resolve({
+                        pass: hasServerPost,
+                        message: hasServerPost ?
+                            'Server data posting functionality found' :
+                            'Server data posting functionality not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkPeriodicSync() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasPeriodicSync = testState.scriptContent.includes('setInterval') ||
+                                          testState.scriptContent.includes('setTimeout') ||
+                                          testState.scriptContent.includes('SYNC_INTERVAL');
+                    resolve({
+                        pass: hasPeriodicSync,
+                        message: hasPeriodicSync ?
+                            'Periodic sync functionality found' :
+                            'Periodic sync functionality not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkConflictResolution() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasConflictResolution = (testState.scriptContent.includes('conflict') ||
+                                                 testState.scriptContent.includes('merge') ||
+                                                 testState.scriptContent.includes('resolve')) &&
+                                                testState.scriptContent.includes('localStorage');
+                    resolve({
+                        pass: hasConflictResolution,
+                        message: hasConflictResolution ?
+                            'Conflict resolution and local storage update found' :
+                            'Conflict resolution and local storage update not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkSyncUI() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasSyncUI = (testState.htmlContent.includes('sync') ||
+                                      testState.htmlContent.includes('notification') ||
+                                      testState.htmlContent.includes('status')) &&
+                                     (testState.scriptContent.includes('syncStatus') ||
+                                      testState.scriptContent.includes('notification') ||
+                                      testState.scriptContent.includes('modal'));
+                    resolve({
+                        pass: hasSyncUI,
+                        message: hasSyncUI ?
+                            'Sync UI elements and notifications found' :
+                            'Sync UI elements and notifications not found'
+                    });
+                }, 100);
+            });
+        }
+
+        // Test execution functions
+        async function runTest(testName, testFunction) {
+            try {
+                const result = await testFunction();
+                testState.results[testName] = result;
+                return result;
+            } catch (error) {
+                const result = { pass: false, message: `Error running test: ${error.message}` };
+                testState.results[testName] = result;
+                return result;
+            }
+        }
+
+        async function runTestCategory(categoryName) {
+            const tests = testCategories[categoryName];
+            const results = {};
+            
+            for (const [testName, testFunction] of Object.entries(tests)) {
+                results[testName] = await runTest(testName, testFunction);
+                updateTestDisplay(categoryName, testName, results[testName]);
+            }
+            
+            return results;
+        }
+
+        async function runFileTests() {
+            showSummary();
+            clearResults();
+            await runTestCategory('File Structure');
+            updateSummary();
+        }
+
+        async function runBasicTests() {
+            showSummary();
+            clearResults();
+            await runTestCategory('Basic Quote Functionality');
+            updateSummary();
+        }
+
+        async function runStorageTests() {
+            showSummary();
+            clearResults();
+            await runTestCategory('Local Storage Features');
+            updateSummary();
+        }
+
+        async function runCategoryTests() {
+            showSummary();
+            clearResults();
+            await runTestCategory('Category Filter Features');
+            updateSummary();
+        }
+
+        async function runSyncTests() {
+            showSummary();
+            clearResults();
+            await runTestCategory('Server Sync Features');
+            updateSummary();
+        }
+
+        async function runAllTests() {
+            showSummary();
+            clearResults();
+            
+            // Run file tests first
+            await runTestCategory('File Structure');
+            
+            // Run other tests
+            for (const categoryName of Object.keys(testCategories)) {
+                if (categoryName !== 'File Structure') {
+                    await runTestCategory(categoryName);
+                }
+            }
+            
+            updateSummary();
+        }
+
+        // Display functions
+        function showSummary() {
+            document.getElementById('summary').style.display = 'block';
+        }
+
+        function clearResults() {
+            testState.results = {};
+            document.getElementById('testResults').innerHTML = '';
+        }
+
+        function updateTestDisplay(categoryName, testName, result) {
+            let categoryDiv = document.getElementById(`category-${categoryName.replace(/\s+/g, '-')}`);
+            
+            if (!categoryDiv) {
+                categoryDiv = createCategoryDiv(categoryName);
+            }
+            
+            const testItem = document.createElement('div');
+            testItem.className = `test-item ${result.pass ? 'pass' : 'fail'}`;
+            
+            testItem.innerHTML = `
+                <div class="test-name">${testName}</div>
+                <div class="test-status status-${result.pass ? 'pass' : 'fail'}">
+                    ${result.pass ? 'PASS' : 'FAIL'}
+                </div>
+                ${!result.pass ? `<div class="error-details">${result.message}</div>` : ''}
+            `;
+            
+            categoryDiv.appendChild(testItem);
+        }
+
+        function createCategoryDiv(categoryName) {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'test-category';
+            categoryDiv.id = `category-${categoryName.replace(/\s+/g, '-')}`;
+            
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.textContent = categoryName;
+            
+            categoryDiv.appendChild(header);
+            document.getElementById('testResults').appendChild(categoryDiv);
+            
+            return categoryDiv;
+        }
+
+        function updateSummary() {
+            const results = Object.values(testState.results);
+            const passed = results.filter(r => r.pass).length;
+            const failed = results.filter(r => !r.pass).length;
+            const total = results.length;
+            
+            document.getElementById('passCount').textContent = passed;
+            document.getElementById('failCount').textContent = failed;
+            document.getElementById('pendingCount').textContent = Math.max(0, Object.keys(testCategories).reduce((sum, cat) => sum + Object.keys(testCategories[cat]).length, 0) - total);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test Checker loaded. Click "Run All Tests" to begin comprehensive testing.');
+        });
+    </script>
+</body>
+</html>
