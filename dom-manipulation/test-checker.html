@@ -623,11 +623,15 @@
                                      (testState.scriptContent.includes('syncStatus') ||
                                       testState.scriptContent.includes('notification') ||
                                       testState.scriptContent.includes('modal'));
+                                      
+                    const hasSpecificMessage = testState.scriptContent.includes('Quotes synced with server!');
+                    
+                    const pass = hasSyncUI && hasSpecificMessage;
                     resolve({
-                        pass: hasSyncUI,
-                        message: hasSyncUI ?
-                            'Sync UI elements and notifications found' :
-                            'Sync UI elements and notifications not found'
+                        pass,
+                        message: pass ?
+                            'Sync UI elements, notifications, and "Quotes synced with server!" message found' :
+                            'Missing sync UI elements, notifications, or "Quotes synced with server!" message'
                     });
                 }, 100);
             });
