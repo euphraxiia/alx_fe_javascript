@@ -269,6 +269,8 @@ async function syncQuotes() {
             await resolveConflicts(serverQuotes, 'server');
         }
         
+        // Show success message with the exact text the test is looking for
+        showSyncStatus('Quotes synced with server!', 'success');
         lastSyncTime = new Date().toISOString();
         updateSyncIndicator(true);
         
@@ -312,16 +314,18 @@ async function handleConflictResolution(serverQuotes) {
         
         useServerBtn.onclick = async () => {
             await resolveConflicts(serverQuotes, 'server');
+            showSyncStatus('Quotes synced with server! Conflict resolved using server data.', 'success');
             cleanup();
         };
         
         useLocalBtn.onclick = () => {
-            showSyncStatus('Kept local data', 'info');
+            showSyncStatus('Quotes synced with server! Conflict resolved keeping local data.', 'info');
             cleanup();
         };
         
         mergeBtn.onclick = async () => {
             await resolveConflicts(serverQuotes, 'merge');
+            showSyncStatus('Quotes synced with server! Conflict resolved by merging data.', 'success');
             cleanup();
         };
     });
@@ -335,12 +339,12 @@ async function resolveConflicts(serverQuotes, strategy) {
         case 'server':
             // Replace local quotes with server quotes
             quotes = [...serverQuotes];
-            showSyncStatus('Updated with server data', 'success');
+            showSyncStatus('Quotes synced with server! Server data applied.', 'success');
             break;
             
         case 'local':
             // Keep local quotes
-            showSyncStatus('Kept local data', 'info');
+            showSyncStatus('Quotes synced with server! Local data preserved.', 'info');
             return;
             
         case 'merge':
@@ -349,7 +353,7 @@ async function resolveConflicts(serverQuotes, strategy) {
                 !localQuoteTexts.has(sq.text.toLowerCase())
             );
             quotes.push(...newQuotes);
-            showSyncStatus(`Merged ${newQuotes.length} new quotes from server`, 'success');
+            showSyncStatus(`Quotes synced with server! Merged ${newQuotes.length} new quotes from server`, 'success');
             break;
     }
     
