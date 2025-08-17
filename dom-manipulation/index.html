@@ -3,81 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Quote Generator</title>
+    <title>Dynamic Quote Generator with Server Sync</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Dynamic Quote Generator</h1>
-        
-        <!-- Sync Status Indicator -->
-        <div id="sync-status" class="sync-status">
-            <span id="sync-indicator" class="sync-indicator">🔄</span>
-            <span id="sync-text">Checking for updates...</span>
-        </div>
-
-        <!-- Notification System -->
-        <div id="notification-container" class="notification-container"></div>
-
-        <!-- Quote Display -->
-        <div id="quoteDisplay" class="quote-display">
-            <blockquote id="quote-text">Click "Show New Quote" to get started!</blockquote>
-            <cite id="quote-author">- Welcome</cite>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <button id="newQuote" class="btn btn-primary">Show New Quote</button>
-            <button id="addQuote" class="btn btn-secondary">Add New Quote</button>
-            <button id="exportQuotes" class="btn btn-info">Export Quotes</button>
-            <button id="importFile" class="btn btn-warning">Import from File</button>
-            <input type="file" id="importFileInput" accept=".json" style="display: none;">
-        </div>
-
-        <!-- Add Quote Form -->
-        <div id="addQuoteForm" class="add-quote-form" style="display: none;">
-            <h3>Add New Quote</h3>
-            <textarea id="newQuoteText" placeholder="Enter quote text..." rows="3"></textarea>
-            <input type="text" id="newQuoteAuthor" placeholder="Enter author name...">
-            <div class="form-controls">
-                <button id="saveQuote" class="btn btn-success">Save Quote</button>
-                <button id="cancelAdd" class="btn btn-danger">Cancel</button>
+        <div class="header">
+            <h1>🚀 Dynamic Quote Generator</h1>
+            <p>With Real-time Server Synchronization</p>
+            
+            <div class="sync-status">
+                <div class="sync-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Initializing...</span>
+                </div>
+                <button onclick="manualSync()" id="manualSyncBtn">Manual Sync</button>
             </div>
         </div>
 
-        <!-- Category Filter -->
-        <div class="filter-section">
-            <label for="categoryFilter">Filter by Category:</label>
-            <select id="categoryFilter">
-                <option value="all">All Categories</option>
-                <option value="motivational">Motivational</option>
-                <option value="wisdom">Wisdom</option>
-                <option value="humor">Humor</option>
-                <option value="life">Life</option>
-            </select>
-        </div>
+        <div class="main-content">
+            <div id="notification" class="notification"></div>
 
-        <!-- Manual Sync Controls -->
-        <div class="sync-controls">
-            <button id="manualSync" class="btn btn-info">Manual Sync</button>
-            <button id="resolveConflicts" class="btn btn-warning" style="display: none;">Resolve Conflicts</button>
-        </div>
-
-        <!-- Conflict Resolution Modal -->
-        <div id="conflictModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>Conflict Resolution Required</h3>
-                <p>There are conflicting versions of quotes. Choose how to resolve:</p>
-                <div id="conflictOptions">
-                    <button id="keepServer" class="btn btn-primary">Keep Server Version</button>
-                    <button id="keepLocal" class="btn btn-secondary">Keep Local Version</button>
-                    <button id="mergeData" class="btn btn-success">Merge Both</button>
+            <div class="quote-display" id="quoteDisplay">
+                <div>
+                    <div class="quote-text">Click "New Quote" to get started!</div>
                 </div>
-                <div id="conflictDetails" class="conflict-details"></div>
+            </div>
+
+            <div class="controls">
+                <button onclick="showRandomQuote()" id="newQuoteBtn">New Quote</button>
+                <button onclick="toggleAddForm()">Add Quote</button>
+                <button onclick="exportQuotes()">Export</button>
+                <button onclick="importQuotes()">Import</button>
+                <input type="file" id="fileInput" accept=".json" class="hidden" onchange="handleFileImport(event)">
+            </div>
+
+            <div class="filter-section">
+                <div class="form-group">
+                    <label for="categoryFilter">Filter by Category:</label>
+                    <select id="categoryFilter" onchange="filterQuotes()">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="addQuoteForm" class="form-section">
+                <h3>Add New Quote</h3>
+                <div class="form-group">
+                    <label for="newQuoteText">Quote Text:</label>
+                    <textarea id="newQuoteText" placeholder="Enter your inspirational quote here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="newQuoteCategory">Category:</label>
+                    <input type="text" id="newQuoteCategory" placeholder="e.g., motivation, wisdom, success">
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <button onclick="saveQuote()">Save Quote</button>
+                    <button onclick="toggleAddForm()" style="background: #6c757d;">Cancel</button>
+                </div>
+            </div>
+
+            <div id="conflictResolution" class="conflict-resolution">
+                <div class="conflict-title">⚠️ Data Conflict Detected</div>
+                <p>We found differences between your local data and the server. Please choose how to resolve:</p>
+                
+                <div class="conflict-options">
+                    <div class="conflict-item">
+                        <h4>📱 Your Local Version</h4>
+                        <div id="localVersion"></div>
+                    </div>
+                    <div class="conflict-item">
+                        <h4>☁️ Server Version</h4>
+                        <div id="serverVersion"></div>
+                    </div>
+                </div>
+                
+                <div class="conflict-actions">
+                    <button onclick="resolveConflict('local')">Keep Local</button>
+                    <button onclick="resolveConflict('server')">Use Server</button>
+                    <button onclick="resolveConflict('merge')">Merge Both</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalQuotes">0</span>
+                    <div class="stat-label">Total Quotes</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="lastSync">Never</span>
+                    <div class="stat-label">Last Sync</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="syncCount">0</span>
+                    <div class="stat-label">Sync Count</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="conflictsResolved">0</span>
+                    <div class="stat-label">Conflicts Resolved</div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Include JavaScript files -->
     <script src="quotes.js"></script>
     <script src="script.js"></script>
 </body>
