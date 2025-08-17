@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Quote Generator - Test Checker</title>
+    <title>Dynamic Quote Generator - Comprehensive Test Checker</title>
     <style>
         * {
             margin: 0;
@@ -211,17 +211,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧪 Dynamic Quote Generator Test Checker</h1>
-            <p>Comprehensive testing for all project requirements</p>
+            <h1>🧪 Dynamic Quote Generator - Comprehensive Test Checker</h1>
+            <p>Testing all requirements from Tasks 0, 1, 2, and 3</p>
         </div>
 
         <div class="test-controls">
             <button class="test-btn run-all" onclick="runAllTests()">🚀 Run All Tests</button>
             <button class="test-btn" onclick="runFileTests()">📁 File Structure</button>
-            <button class="test-btn" onclick="runBasicTests()">⚡ Basic Features</button>
-            <button class="test-btn" onclick="runStorageTests()">💾 Storage Features</button>
-            <button class="test-btn" onclick="runCategoryTests()">🏷️ Category Features</button>
-            <button class="test-btn" onclick="runSyncTests()">🔄 Sync Features</button>
+            <button class="test-btn" onclick="runTask0Tests()">⚡ Task 0: DOM Manipulation</button>
+            <button class="test-btn" onclick="runTask1Tests()">💾 Task 1: Web Storage & JSON</button>
+            <button class="test-btn" onclick="runTask2Tests()">🏷️ Task 2: Content Filtering</button>
+            <button class="test-btn" onclick="runTask3Tests()">🔄 Task 3: Server Sync</button>
         </div>
 
         <div class="results-container">
@@ -256,39 +256,44 @@
             cssContent: ''
         };
 
-        // Test definitions
+        // Comprehensive test definitions for all tasks
         const testCategories = {
             'File Structure': {
                 'Check if index.html exists': () => checkFileExists('index.html'),
                 'Check if script.js exists': () => checkFileExists('script.js'),
                 'Check if style.css exists': () => checkFileExists('style.css'),
+                'Check if test-checker.html exists': () => checkFileExists('test-checker.html'),
             },
-            'Basic Quote Functionality': {
+            
+            'Task 0: Building Dynamic Content Generator with Advanced DOM Manipulation': {
                 'Check for quotes array with text and category properties': () => checkQuotesArray(),
-                'Check for displayRandomQuote function': () => checkDisplayRandomQuoteFunction(),
+                'Check for showRandomQuote function': () => checkShowRandomQuoteFunction(),
+                'Check for createAddQuoteForm function': () => checkFunction('createAddQuoteForm'),
                 'Check for addQuote function': () => checkFunction('addQuote'),
-                'Check for "Show New Quote" button event listener': () => checkEventListener('newQuote', 'click'),
+                'Check for logic to add new quote to quotes array and update DOM': () => checkAddQuoteLogic(),
+                'Check for event listener on "Show New Quote" button': () => checkShowNewQuoteEventListener(),
                 'Check for logic to select random quote and update DOM': () => checkRandomQuoteLogic(),
-                'Check for logic to add new quote to array and update DOM': () => checkAddQuoteLogic(),
             },
-            'Local Storage Features': {
+            
+            'Task 1: Implementing Web Storage and JSON Handling': {
                 'Check for saving quotes to local storage': () => checkLocalStorageSave(),
                 'Check for loading quotes from local storage on initialization': () => checkLocalStorageLoad(),
                 'Check for saving last viewed quote to session storage': () => checkSessionStorageSave(),
-                'Check for export quotes button': () => checkExportButton(),
                 'Check for exportToJsonFile function': () => checkExportToJsonFileFunction(),
                 'Check for import quotes file input': () => checkImportInput(),
                 'Check for importFromJsonFile function': () => checkFunction('importFromJsonFile'),
             },
-            'Category Filter Features': {
+            
+            'Task 2: Creating Dynamic Content Filtering System Using Web Storage and JSON': {
                 'Check for populateCategories function': () => checkFunction('populateCategories'),
-                'Check for extracting unique categories and populating dropdown': () => checkCategoryPopulation(),
-                'Check for filterQuote function': () => checkFilterQuoteFunction(),
-                'Check for logic to filter quotes based on selected category': () => checkFilterLogic(),
+                'Check for extracting unique categories and populating dropdown menu': () => checkCategoryPopulation(),
+                'Check for filterQuotes function': () => checkFilterQuotesFunction(),
+                'Check for logic to filter and update displayed quotes based on selected category': () => checkFilterLogic(),
                 'Check for saving selected category to local storage': () => checkCategorySave(),
-                'Check for restoring last selected category on page load': () => checkCategoryRestore(),
+                'Check for restoring last selected category when page loads': () => checkCategoryRestore(),
             },
-            'Server Sync Features': {
+            
+            'Task 3: Syncing Data with Server and Implementing Conflict Resolution': {
                 'Check for fetchQuotesFromServer function': () => checkFunction('fetchQuotesFromServer'),
                 'Check for fetching data from server using mock API': () => checkServerFetch(),
                 'Check for posting data to server using mock API': () => checkServerPost(),
@@ -302,7 +307,6 @@
         // File checking utilities
         function checkFileExists(filename) {
             try {
-                // Try to fetch the file
                 return fetch(filename)
                     .then(response => {
                         if (response.ok) {
@@ -324,7 +328,7 @@
             }
         }
 
-        // Script content checking utilities
+        // Generic function checker
         function checkFunction(functionName) {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -342,6 +346,7 @@
             });
         }
 
+        // TASK 0 SPECIFIC TESTS
         function checkQuotesArray() {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -362,16 +367,53 @@
             });
         }
 
-        function checkEventListener(elementId, eventType) {
+        function checkShowRandomQuoteFunction() {
             return new Promise((resolve) => {
                 setTimeout(() => {
-                    const hasEventListener = testState.scriptContent.includes(`getElementById('${elementId}')`) &&
-                                            testState.scriptContent.includes(`addEventListener('${eventType}'`);
+                    const hasShowRandomQuote = testState.scriptContent.includes('function showRandomQuote') || 
+                                              testState.scriptContent.includes('showRandomQuote =') ||
+                                              testState.scriptContent.includes('const showRandomQuote') ||
+                                              testState.scriptContent.includes('let showRandomQuote');
+                    resolve({
+                        pass: hasShowRandomQuote,
+                        message: hasShowRandomQuote ? 
+                            'showRandomQuote function found' : 
+                            'showRandomQuote function not found in script.js'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkShowNewQuoteEventListener() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasEventListener = (testState.scriptContent.includes(`getElementById('newQuote')`) &&
+                                            testState.scriptContent.includes(`addEventListener('click'`)) ||
+                                           (testState.htmlContent.includes('id="newQuote"') &&
+                                            testState.htmlContent.includes('onclick='));
                     resolve({
                         pass: hasEventListener,
                         message: hasEventListener ?
-                            `Event listener for ${elementId} (${eventType}) found` :
-                            `Event listener for ${elementId} (${eventType}) not found`
+                            'Event listener for "Show New Quote" button found' :
+                            'Event listener for "Show New Quote" button not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkAddQuoteLogic() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasAddLogic = testState.scriptContent.includes('quotes.push(') &&
+                                       (testState.scriptContent.includes('newQuoteText') || 
+                                        testState.scriptContent.includes('getElementById')) &&
+                                       testState.scriptContent.includes('textContent') ||
+                                       testState.scriptContent.includes('innerHTML');
+                    resolve({
+                        pass: hasAddLogic,
+                        message: hasAddLogic ?
+                            'Add quote logic (push to array, get input values, update DOM) found' :
+                            'Add quote logic (push to array, get input values, update DOM) not found'
                     });
                 }, 100);
             });
@@ -382,7 +424,8 @@
                 setTimeout(() => {
                     const hasRandomLogic = testState.scriptContent.includes('Math.random()') &&
                                           testState.scriptContent.includes('Math.floor') &&
-                                          (testState.scriptContent.includes('textContent') || testState.scriptContent.includes('innerHTML'));
+                                          (testState.scriptContent.includes('textContent') || 
+                                           testState.scriptContent.includes('innerHTML'));
                     resolve({
                         pass: hasRandomLogic,
                         message: hasRandomLogic ?
@@ -393,21 +436,7 @@
             });
         }
 
-        function checkAddQuoteLogic() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const hasAddLogic = testState.scriptContent.includes('push(') &&
-                                       (testState.scriptContent.includes('newQuoteText') || testState.scriptContent.includes('getElementById'));
-                    resolve({
-                        pass: hasAddLogic,
-                        message: hasAddLogic ?
-                            'Add quote logic found' :
-                            'Add quote logic (push to array, get input values) not found'
-                    });
-                }, 100);
-            });
-        }
-
+        // TASK 1 SPECIFIC TESTS
         function checkLocalStorageSave() {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -453,16 +482,21 @@
             });
         }
 
-        function checkExportButton() {
+        function checkExportToJsonFileFunction() {
             return new Promise((resolve) => {
                 setTimeout(() => {
-                    const hasExportButton = testState.htmlContent.includes('exportQuotes') ||
-                                           testState.htmlContent.includes('Export');
+                    const hasFunction = testState.scriptContent.includes('function exportToJsonFile') || 
+                                       testState.scriptContent.includes('exportToJsonFile =') ||
+                                       testState.scriptContent.includes('const exportToJsonFile') ||
+                                       testState.scriptContent.includes('let exportToJsonFile');
+                    const hasBlob = testState.scriptContent.includes('Blob');
+                    
+                    const pass = hasFunction && hasBlob;
                     resolve({
-                        pass: hasExportButton,
-                        message: hasExportButton ?
-                            'Export quotes button found' :
-                            'Export quotes button not found in HTML'
+                        pass,
+                        message: pass ? 
+                            'exportToJsonFile function with Blob usage found' : 
+                            'exportToJsonFile function or Blob usage not found in script.js'
                     });
                 }, 100);
             });
@@ -472,7 +506,8 @@
             return new Promise((resolve) => {
                 setTimeout(() => {
                     const hasImportInput = testState.htmlContent.includes('type="file"') &&
-                                          (testState.htmlContent.includes('importFile') || testState.htmlContent.includes('import'));
+                                          (testState.htmlContent.includes('importFile') || 
+                                           testState.htmlContent.includes('import'));
                     resolve({
                         pass: hasImportInput,
                         message: hasImportInput ?
@@ -483,6 +518,7 @@
             });
         }
 
+        // TASK 2 SPECIFIC TESTS
         function checkCategoryPopulation() {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -500,6 +536,23 @@
             });
         }
 
+        function checkFilterQuotesFunction() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasFilterQuotes = testState.scriptContent.includes('function filterQuotes') || 
+                                          testState.scriptContent.includes('filterQuotes =') ||
+                                          testState.scriptContent.includes('const filterQuotes') ||
+                                          testState.scriptContent.includes('let filterQuotes');
+                    resolve({
+                        pass: hasFilterQuotes,
+                        message: hasFilterQuotes ? 
+                            'filterQuotes function found' : 
+                            'filterQuotes function not found in script.js'
+                    });
+                }, 100);
+            });
+        }
+
         function checkFilterLogic() {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -509,8 +562,8 @@
                     resolve({
                         pass: hasFilterLogic,
                         message: hasFilterLogic ?
-                            'Quote filtering logic found' :
-                            'Quote filtering logic not found'
+                            'Quote filtering and display update logic found' :
+                            'Quote filtering and display update logic not found'
                     });
                 }, 100);
             });
@@ -540,71 +593,14 @@
                     resolve({
                         pass: hasCategoryRestore,
                         message: hasCategoryRestore ?
-                            'Category restore from local storage found' :
-                            'Category restore from local storage not found'
+                            'Category restore from local storage on page load found' :
+                            'Category restore from local storage on page load not found'
                     });
                 }, 100);
             });
         }
 
-        function checkFilterQuoteFunction() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const hasFilterQuote = testState.scriptContent.includes('function filterQuote') || 
-                                          testState.scriptContent.includes('filterQuote =') ||
-                                          testState.scriptContent.includes('const filterQuote') ||
-                                          testState.scriptContent.includes('let filterQuote');
-                    resolve({
-                        pass: hasFilterQuote,
-                        message: hasFilterQuote ? 
-                            'filterQuote function found' : 
-                            'filterQuote function not found in script.js'
-                    });
-                }, 100);
-            });
-        }
-
-        function checkExportToJsonFileFunction() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const hasFunction = testState.scriptContent.includes('function exportToJsonFile') || 
-                                       testState.scriptContent.includes('exportToJsonFile =') ||
-                                       testState.scriptContent.includes('const exportToJsonFile') ||
-                                       testState.scriptContent.includes('let exportToJsonFile');
-                    const hasBlob = testState.scriptContent.includes('Blob');
-                    
-                    const pass = hasFunction && hasBlob;
-                    resolve({
-                        pass,
-                        message: pass ? 
-                            'exportToJsonFile function with Blob usage found' : 
-                            'exportToJsonFile function or Blob usage not found in script.js'
-                    });
-                }, 100);
-            });
-        }
-
-        function checkDisplayRandomQuoteFunction() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const hasDisplayRandomQuote = testState.scriptContent.includes('function displayRandomQuote') || 
-                                                 testState.scriptContent.includes('displayRandomQuote =') ||
-                                                 testState.scriptContent.includes('const displayRandomQuote') ||
-                                                 testState.scriptContent.includes('let displayRandomQuote');
-                    const hasShowRandomQuote = testState.scriptContent.includes('showRandomQuote');
-                    
-                    const pass = hasDisplayRandomQuote && hasShowRandomQuote;
-                    resolve({
-                        pass,
-                        message: pass ? 
-                            'displayRandomQuote function and showRandomQuote alias found' : 
-                            'displayRandomQuote function or showRandomQuote alias not found in script.js'
-                    });
-                }, 100);
-            });
-        }
-
-        // Server sync tests
+        // TASK 3 SPECIFIC TESTS
         function checkServerFetch() {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -726,31 +722,31 @@
             updateSummary();
         }
 
-        async function runBasicTests() {
+        async function runTask0Tests() {
             showSummary();
             clearResults();
-            await runTestCategory('Basic Quote Functionality');
+            await runTestCategory('Task 0: Building Dynamic Content Generator with Advanced DOM Manipulation');
             updateSummary();
         }
 
-        async function runStorageTests() {
+        async function runTask1Tests() {
             showSummary();
             clearResults();
-            await runTestCategory('Local Storage Features');
+            await runTestCategory('Task 1: Implementing Web Storage and JSON Handling');
             updateSummary();
         }
 
-        async function runCategoryTests() {
+        async function runTask2Tests() {
             showSummary();
             clearResults();
-            await runTestCategory('Category Filter Features');
+            await runTestCategory('Task 2: Creating Dynamic Content Filtering System Using Web Storage and JSON');
             updateSummary();
         }
 
-        async function runSyncTests() {
+        async function runTask3Tests() {
             showSummary();
             clearResults();
-            await runTestCategory('Server Sync Features');
+            await runTestCategory('Task 3: Syncing Data with Server and Implementing Conflict Resolution');
             updateSummary();
         }
 
@@ -758,14 +754,9 @@
             showSummary();
             clearResults();
             
-            // Run file tests first
-            await runTestCategory('File Structure');
-            
-            // Run other tests
+            // Run all test categories in order
             for (const categoryName of Object.keys(testCategories)) {
-                if (categoryName !== 'File Structure') {
-                    await runTestCategory(categoryName);
-                }
+                await runTestCategory(categoryName);
             }
             
             updateSummary();
@@ -782,7 +773,7 @@
         }
 
         function updateTestDisplay(categoryName, testName, result) {
-            let categoryDiv = document.getElementById(`category-${categoryName.replace(/\s+/g, '-')}`);
+            let categoryDiv = document.getElementById(`category-${categoryName.replace(/\s+/g, '-').replace(/:/g, '')}`);
             
             if (!categoryDiv) {
                 categoryDiv = createCategoryDiv(categoryName);
@@ -805,7 +796,7 @@
         function createCategoryDiv(categoryName) {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'test-category';
-            categoryDiv.id = `category-${categoryName.replace(/\s+/g, '-')}`;
+            categoryDiv.id = `category-${categoryName.replace(/\s+/g, '-').replace(/:/g, '')}`;
             
             const header = document.createElement('div');
             header.className = 'category-header';
@@ -830,7 +821,7 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Test Checker loaded. Click "Run All Tests" to begin comprehensive testing.');
+            console.log('Comprehensive Test Checker loaded. Click "Run All Tests" to begin testing all tasks.');
         });
     </script>
 </body>
