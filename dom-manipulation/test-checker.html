@@ -265,7 +265,7 @@
             },
             'Basic Quote Functionality': {
                 'Check for quotes array with text and category properties': () => checkQuotesArray(),
-                'Check for displayRandomQuote function': () => checkFunction('displayRandomQuote'),
+                'Check for displayRandomQuote function': () => checkDisplayRandomQuoteFunction(),
                 'Check for addQuote function': () => checkFunction('addQuote'),
                 'Check for "Show New Quote" button event listener': () => checkEventListener('newQuote', 'click'),
                 'Check for logic to select random quote and update DOM': () => checkRandomQuoteLogic(),
@@ -276,14 +276,14 @@
                 'Check for loading quotes from local storage on initialization': () => checkLocalStorageLoad(),
                 'Check for saving last viewed quote to session storage': () => checkSessionStorageSave(),
                 'Check for export quotes button': () => checkExportButton(),
-                'Check for exportToJsonFile function': () => checkFunction('exportToJsonFile'),
+                'Check for exportToJsonFile function': () => checkExportToJsonFileFunction(),
                 'Check for import quotes file input': () => checkImportInput(),
                 'Check for importFromJsonFile function': () => checkFunction('importFromJsonFile'),
             },
             'Category Filter Features': {
                 'Check for populateCategories function': () => checkFunction('populateCategories'),
                 'Check for extracting unique categories and populating dropdown': () => checkCategoryPopulation(),
-                'Check for filterQuotes function': () => checkFunction('filterQuotes'),
+                'Check for filterQuote function': () => checkFilterQuoteFunction(),
                 'Check for logic to filter quotes based on selected category': () => checkFilterLogic(),
                 'Check for saving selected category to local storage': () => checkCategorySave(),
                 'Check for restoring last selected category on page load': () => checkCategoryRestore(),
@@ -542,6 +542,63 @@
                         message: hasCategoryRestore ?
                             'Category restore from local storage found' :
                             'Category restore from local storage not found'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkFilterQuoteFunction() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasFilterQuote = testState.scriptContent.includes('function filterQuote') || 
+                                          testState.scriptContent.includes('filterQuote =') ||
+                                          testState.scriptContent.includes('const filterQuote') ||
+                                          testState.scriptContent.includes('let filterQuote');
+                    resolve({
+                        pass: hasFilterQuote,
+                        message: hasFilterQuote ? 
+                            'filterQuote function found' : 
+                            'filterQuote function not found in script.js'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkExportToJsonFileFunction() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasFunction = testState.scriptContent.includes('function exportToJsonFile') || 
+                                       testState.scriptContent.includes('exportToJsonFile =') ||
+                                       testState.scriptContent.includes('const exportToJsonFile') ||
+                                       testState.scriptContent.includes('let exportToJsonFile');
+                    const hasBlob = testState.scriptContent.includes('Blob');
+                    
+                    const pass = hasFunction && hasBlob;
+                    resolve({
+                        pass,
+                        message: pass ? 
+                            'exportToJsonFile function with Blob usage found' : 
+                            'exportToJsonFile function or Blob usage not found in script.js'
+                    });
+                }, 100);
+            });
+        }
+
+        function checkDisplayRandomQuoteFunction() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const hasDisplayRandomQuote = testState.scriptContent.includes('function displayRandomQuote') || 
+                                                 testState.scriptContent.includes('displayRandomQuote =') ||
+                                                 testState.scriptContent.includes('const displayRandomQuote') ||
+                                                 testState.scriptContent.includes('let displayRandomQuote');
+                    const hasShowRandomQuote = testState.scriptContent.includes('showRandomQuote');
+                    
+                    const pass = hasDisplayRandomQuote && hasShowRandomQuote;
+                    resolve({
+                        pass,
+                        message: pass ? 
+                            'displayRandomQuote function and showRandomQuote alias found' : 
+                            'displayRandomQuote function or showRandomQuote alias not found in script.js'
                     });
                 }, 100);
             });
