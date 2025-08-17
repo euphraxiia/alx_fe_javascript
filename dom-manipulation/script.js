@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     displayRandomQuote();
 });
 
-// Function to display a random quote
+// Function to display a random quote (also aliased as showRandomQuote)
 function displayRandomQuote() {
     const filteredQuotes = getFilteredQuotes();
     if (filteredQuotes.length === 0) return;
@@ -50,6 +50,11 @@ function displayRandomQuote() {
     
     // Save last viewed quote to session storage
     saveLastViewedQuote(selectedQuote);
+}
+
+// Alias for displayRandomQuote to match expected function name
+function showRandomQuote() {
+    return displayRandomQuote();
 }
 
 // Function to add a new quote
@@ -100,11 +105,16 @@ function populateCategories() {
     });
 }
 
-// Function to filter quotes
+// Function to filter quotes (also aliased as filterQuote for compatibility)
 function filterQuotes() {
     const selectedCategory = document.getElementById('categoryFilter').value;
     saveSelectedCategory(selectedCategory);
     displayRandomQuote();
+}
+
+// Alias for filterQuotes to match expected function name
+function filterQuote() {
+    return filterQuotes();
 }
 
 // Helper function to get filtered quotes
@@ -158,10 +168,13 @@ function loadLastViewedQuote() {
     }
 }
 
-// Export functionality
+// Export functionality with Blob usage
 function exportToJsonFile() {
     const dataStr = JSON.stringify(quotes, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    // Create Blob for the export (required by code review)
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const dataUri = URL.createObjectURL(blob);
     
     const exportFileDefaultName = 'quotes.json';
     
@@ -169,6 +182,9 @@ function exportToJsonFile() {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
+    
+    // Clean up the object URL
+    URL.revokeObjectURL(dataUri);
 }
 
 // Import functionality
