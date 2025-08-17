@@ -24,17 +24,19 @@
 
         <!-- Controls -->
         <div class="controls">
+            <!-- Show New Quote Button - Required for Task 0 -->
             <button id="newQuote">Show New Quote</button>
             
-            <!-- Category Filter -->
+            <!-- Category Filter - Required for Task 2 -->
             <div class="filter-section">
                 <label for="categoryFilter">Filter by Category:</label>
-                <select id="categoryFilter">
+                <select id="categoryFilter" onchange="filterQuotes()">
                     <option value="all">All Categories</option>
+                    <!-- Categories will be dynamically populated -->
                 </select>
             </div>
 
-            <!-- Sync Controls -->
+            <!-- Sync Controls - Required for Task 3 -->
             <div class="sync-controls">
                 <button id="syncNow" class="sync-button">Sync Now</button>
                 <div class="sync-indicator">
@@ -44,23 +46,25 @@
             </div>
         </div>
 
-        <!-- Add Quote Form -->
+        <!-- Add Quote Form - Required for Task 0 -->
         <div class="add-quote-form">
             <h3>Add New Quote</h3>
             <input type="text" id="newQuoteText" placeholder="Enter quote text" required>
             <input type="text" id="newQuoteCategory" placeholder="Enter category" required>
-            <button id="addQuoteBtn">Add Quote</button>
+            <button id="addQuoteBtn" onclick="addQuote()">Add Quote</button>
         </div>
 
-        <!-- Import/Export Section -->
+        <!-- Import/Export Section - Required for Task 1 -->
         <div class="import-export-section">
             <h3>Import/Export Quotes</h3>
-            <input type="file" id="importFile" accept=".json" style="display: none;">
-            <button id="importQuotes">Import Quotes</button>
-            <button id="exportQuotes">Export Quotes</button>
+            <!-- Import file input - Required for Task 1 -->
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importFromJsonFile(event)">
+            <button id="importQuotes" onclick="document.getElementById('importFile').click()">Import Quotes</button>
+            <!-- Export button - Required for Task 1 -->
+            <button id="exportQuotes" onclick="exportToJsonFile()">Export Quotes</button>
         </div>
 
-        <!-- Conflict Resolution Modal -->
+        <!-- Conflict Resolution Modal - Required for Task 3 -->
         <div id="conflictModal" class="modal hidden">
             <div class="modal-content">
                 <h3>Conflict Detected</h3>
